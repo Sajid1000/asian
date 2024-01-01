@@ -19,7 +19,7 @@ router.get('/', async (req, res) => {
                     if (!page) {
                         page = 1
                     }
-                    const siteUrl = `https://asianembed.io/recently-added-raw?page=${page}`
+                    const siteUrl = `https://draplay.info/recently-added-raw?page=${page}`
                     const { data } = await axios.get(siteUrl)
                     const $ = cheerio.load(data)
                     let dataArr = []
