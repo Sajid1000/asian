@@ -27,7 +27,7 @@ const getPopularRouter = require('./routes/getPopular')
 const getRecentRouter = require('./routes/getRecent')
 const getRecentKDramaRouter = require('./routes/getRecentKDrama')
 const getRecentRawRouter = require('./routes/getRecentRaw')
-const getEpisodeRouter = require('./routes/getEpisode')
+const getEpisodeListRouter = require('./routes/getEpisodeList')
 const homeRouter = require('./routes/home')
 
 
@@ -38,7 +38,7 @@ app.use('/api/popular', getPopularRouter)
 app.use('/api/recent', getRecentRouter)
 app.use('/api/recentkdrama', getRecentKDramaRouter)
 app.use('/api/recentraw', getRecentRawRouter)
-app.use('/api/episode', getEpisode)
+app.use('/api/episodeList', getEpisodeListRouter)
 app.use('*', homeRouter)
  
 app.listen(process.env.PORT, () => {
