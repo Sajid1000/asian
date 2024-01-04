@@ -6,14 +6,14 @@ require('dotenv').config()
 const apiKey = process.env.API_KEY
 const router = express.Router();
 
-router.get('/:epid', async (req, res) => {
+router.get('/:id', async (req, res) => {
     let api_key = req.query.api_key
     if (api_key != apiKey) {
         return res.send({response: 'Invalid API Key!'})
     }
     else {
         try {
-            const getEpisodeList = async () => {
+            const getEpisode = async () => {
                 try {
                     let id = req.params.id;
                     const siteUrl = `https://draplay.info/videos/${id}`
@@ -22,7 +22,7 @@ router.get('/:epid', async (req, res) => {
                     let dataArr = []
                     
 
-                    const episodeList = $("ul.listing.items.lists > li.video-block")
+                    const episode = $("ul.listing.items.lists > li.video-block")
         .map((i, el) => {
           const $el = $(el);
           const title = $el.find("a > div.name").text();
@@ -50,14 +50,14 @@ router.get('/:epid', async (req, res) => {
                         })
                         dataArr.push({
                            
-                            episodeList
+                            episode
                         })
                     }
                     else {
                         let description = $(parentPara).text().trim()
                         dataArr.push({
                            
-                            episodeList
+                            episode
                         })
                     }
                     return dataArr
