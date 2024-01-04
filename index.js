@@ -38,7 +38,7 @@ app.use('/api/popular', getPopularRouter)
 app.use('/api/recent', getRecentRouter)
 app.use('/api/recentkdrama', getRecentKDramaRouter)
 app.use('/api/recentraw', getRecentRawRouter)
-app.use('/api/Episode', getEpisode)
+app.use('/api/episode', getEpisode)
 app.use('*', homeRouter)
  
 app.listen(process.env.PORT, () => {
