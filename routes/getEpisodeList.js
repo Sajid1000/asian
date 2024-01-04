@@ -68,9 +68,9 @@ router.get('/:id', async (req, res) => {
       };
 
       const apiData = await getEpisodeList();
-      return res.status(200).json({
-        result: apiData,
-      });
+      const result = { result: apiData };
+      const formattedJSON = JSON.stringify(result, null, 2); // Use 2 spaces for indentation
+      return res.status(200).send(formattedJSON);
     } catch (error) {
       return res.status(500).json({
         error: error.toString(),
@@ -80,4 +80,3 @@ router.get('/:id', async (req, res) => {
 });
 
 module.exports = router;
-
