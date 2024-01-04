@@ -21,6 +21,8 @@
 
 ```/api/movies``` returns recent movies.
 
+```/api/episodeList``` returns episode list.
+
 ```/api/detail/{id}``` returns details of drama , required parameter is id of drama.
 
 
