@@ -13,7 +13,7 @@ router.get('/:id', async (req, res) => {
     }
     else {
         try {
-            const getDetail = async () => {
+            const getepisodeList = async () => {
                 try {
                     let id = req.params.id;
                     const siteUrl = `https://draplay.info/videos/${id}`
@@ -66,7 +66,7 @@ const parentPara = $('div.content-more-js')
                     console.error(error)
                 }
             }
-            const apiData = await getDetail()
+            const apiData = await getepisodeList()
             return res.status(200).json({
                 result: apiData,
             })
