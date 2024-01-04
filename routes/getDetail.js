@@ -27,7 +27,25 @@ router.get('/:id', async (req, res) => {
                     let totalEp = $('ul.listing.items.lists').find('li').length
             
                     let embedLink = $('div.play-video').find('iframe').attr('src')
-            
+
+                    const episodeList = $("ul.listing.items.lists > li.video-block")
+        .map((i, el) => {
+          const $el = $(el);
+          const title = $el.find("a > div.name").text();
+          const date = $el.find("a > div.meta > span.date").text();
+          const URL = $el.find("a").attr("href");
+          const cover = $el.find("a > div.img > div.picture > img").attr("src");
+          const id = i + 1;
+          return {
+            id: id,
+            cover: cover,
+            title: title,
+            date: date,
+            URL: URL,
+          };
+        })
+        .toArray();
+                    
                     const parentPara = $('div.content-more-js')
                     const checkPara = $(parentPara).find('p')
             
@@ -40,7 +58,8 @@ router.get('/:id', async (req, res) => {
                             name,
                             description,
                             totalEp,
-                            embedLink
+                            embedLink,
+                            episodeList
                         })
                     }
                     else {
@@ -49,7 +68,8 @@ router.get('/:id', async (req, res) => {
                             name,
                             description,
                             totalEp,
-                            embedLink
+                            embedLink,
+                            episodeList
                         })
                     }
                     return dataArr
