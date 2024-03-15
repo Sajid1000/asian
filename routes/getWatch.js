@@ -8,6 +8,15 @@ const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
 
 const router = express.Router();
 
+async function fetchData(url) {
+    try {
+        const response = await axios.get(url);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
+
 router.get('/:id', async (req, res) => {
     try {
         const epId = req.params.id;
