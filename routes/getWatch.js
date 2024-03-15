@@ -1,96 +1,118 @@
-const express = require('express');
-const axios = require('axios');
-const cheerio = require('cheerio');
-const { JSDOM } = require('jsdom');
-const { generateEncryptAjaxParameters, decryptEncryptAjaxResponse } = require('./extractors/asianload.js');
+import axios from 'axios'
+import { JSDOM } from 'jsdom'
+import { generateEncryptAjaxParameters, decryptEncryptAjaxResponse } from '../extractors/asianload.js'
 
-const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36';
+const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0 Win64 x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36'
 
-const router = express.Router();
+let PROXY_URL
 
-let PROXY_URL;
+export async function corsProxy(url) {
+    PROXY_URL = `${url}/proxy?url=`
+}
 
-router.use(corsProxy);
+const BASE_URL = 'https://draplay.info'
 
 // Cache object to store fetched data
-const cache = {};
+const cache = {}
 
 async function fetchData(url) {
     if (cache[url]) {
-        return cache[url];
+        return cache[url]
     }
-    const response = await axios.get(url);
-    cache[url] = response.data;
-    return response.data;
+    const response = await axios.get(url)
+    cache[url] = response.data
+    return response.data
 }
 
-router.get('/:id', async (req, res) => {
+
+
+
+export async function getVideoDrama(epId) {
+    const url = `${PROXY_URL}${BASE_URL}/videos/${epId}`
     try {
-        const epId = req.params.id;
-        const url = `${PROXY_URL}https://draplay.info/videos/${epId}`;
-        const html = await fetchData(url);
-        const dom = new JSDOM(html);
-        const $ = cheerio.load(dom.window.document.documentElement.innerHTML);
+        const html = await fetchData(url)
+        const dom = new JSDOM(html)
+        const doc = dom.window.document
 
-        const items = $('ul.listing.items.lists > li.video-block > a');
-        const title = $('div.video-info-left > h1').text();
-        const desc = $('#rmjs-1').text().trim();
-        const iframe = $('div.watch_play > div.play-video > iframe').attr('src');
-        const episodes = [];
+        const items = doc.querySelectorAll('ul.listing.items.lists > li.video-block > a')
+        const title = doc.querySelector('div.video-info-left > h1').textContent
+        const desc = doc.querySelector('#rmjs-1').textContent.trim()
+        const iframe = doc.querySelector('div.watch_play > div.play-video > iframe').src
+        const episodes = []
 
-        items.each((index, element) => {
+        items.forEach(item => {
             episodes.push({
-                episodeId: $(element).attr('href').split('videos/')[1],
-                episodeNum: parseFloat($(element).text().match(/episode-(.*)/i)[1].split('-').join('.')),
-                url: `${PROXY_URL}https://draplay.info${$(element).attr('href')}`,
-            });
-        });
+                episodeId: `${item.toString().split('videos/')[1]}`,
+                episodeNum: parseFloat(`${item.toString().match(/episode-(.*)/i)?.[1].split('-').join('.')}`),
+                url: `${BASE_URL}${item}`,
+            })
+        })
 
-        const primarySources = [];
-        const backupSources = [];
+        return {
+            title: title,
+            desc: desc,
+            videoSrc,
+            episodes: episodes.reverse()
+        }
+    } catch (error) {
+        throw error
+    }
+}
+
+export async function scrapeM3U8(episodeId) {
+    let primarySources = []
+    let backupSources = []
+
+    try {
+        let episodePage, videoServer, $, serverUrl
+
+        if (!episodeId) {
+            throw Error('Episode ID not found')
+        }
+
+        const episodeUrl = `${PROXY_URL}${BASE_URL}/videos/${episodeId}`
+        const episodeHtml = await fetchData(episodeUrl)
+        $ = cheerio.load(episodeHtml)
+
+        videoServer = $('div.watch_play > div.play-video > iframe').attr('src')
+        serverUrl = new URL(`https:${videoServer}`)
+
+        const goGoServerPage = await axios.get(serverUrl.href, {
+            headers: { 'User-Agent': USER_AGENT },
+        })
+        const $$ = cheerio.load(goGoServerPage.data)
 
         const ajaxParameters = await generateEncryptAjaxParameters(
-            cheerio,
-            $(items).find('a').attr('href').split('videos/')[1]
-        );
+            $$,
+            serverUrl.searchParams.get('id')
+        )
 
         const fetchResponse = await axios.get(
-            `${url}/encrypt-ajax.php?${ajaxParameters}`,
+            `${serverUrl.protocol}//${serverUrl.hostname}/encrypt-ajax.php?${ajaxParameters}`,
             {
                 headers: {
                     'User-Agent': USER_AGENT,
                     'X-Requested-With': 'XMLHttpRequest',
                 },
             }
-        );
+        )
 
-        const decryptedResponse = decryptEncryptAjaxResponse(fetchResponse.data);
+        const decryptedResponse = decryptEncryptAjaxResponse(fetchResponse.data)
 
         if (!decryptedResponse.source) {
-            return res.status(404).json({ error: 'No sources found. Try a different source.' });
+            return { error: 'No sources found. Try a different source.' }
         }
 
-        decryptedResponse.source.forEach((source) => primarySources.push(source));
-        decryptedResponse.source_bk.forEach((source) => backupSources.push(source));
+        decryptedResponse.source.forEach((source) => primarySources.push(source))
+        decryptedResponse.source_bk.forEach((source) => backupSources.push(source))
 
-        return res.status(200).json({
-            title: title,
-            description: desc,
-            videoSrc: iframe,
-            episodes: episodes.reverse(),
-            referer: url,
+        return {
+            referer: serverUrl.href,
             primarySrc: primarySources,
             backupSrc: backupSources,
-        });
+        }
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ error: error.message });
+        return { error: error.message }
     }
-});
-
-module.exports = router;
-
-async function corsProxy(req, res, next) {
-    PROXY_URL = `${req.protocol}://${req.get('host')}/proxy?url=`;
-    next();
 }
+
