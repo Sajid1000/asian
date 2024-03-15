@@ -94,4 +94,3 @@ async function corsProxy(req, res, next) {
     PROXY_URL = `${req.protocol}://${req.get('host')}/proxy?url=`;
     next();
 }
-
