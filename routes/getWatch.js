@@ -48,7 +48,7 @@ router.get('/:id', async (req, res) => {
         const backupSources = [];
 
         const ajaxParameters = await generateEncryptAjaxParameters(
-            cheerio,
+            $,
             epId
         );
 
