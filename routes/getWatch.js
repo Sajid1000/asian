@@ -33,10 +33,14 @@ router.get('/:id', async (req, res) => {
         const episodes = [];
 
         items.each((index, element) => {
+            const href = $(element).attr('href');
+            const episodeId = href ? href.split('videos/')[1] : null;
+            const episodeNum = parseFloat($(element).text().match(/episode-(.*)/i)?.[1].split('-').join('.'));
+
             episodes.push({
-                episodeId: $(element).attr('href').split('videos/')[1],
-                episodeNum: parseFloat($(element).text().match(/episode-(.*)/i)[1].split('-').join('.')),
-                url: `${PROXY_URL}https://draplay.info${$(element).attr('href')}`,
+                episodeId: episodeId,
+                episodeNum: episodeNum,
+                url: `${PROXY_URL}https://draplay.info${href}`,
             });
         });
 
@@ -45,7 +49,7 @@ router.get('/:id', async (req, res) => {
 
         const ajaxParameters = await generateEncryptAjaxParameters(
             cheerio,
-            $(items).find('a').attr('href').split('videos/')[1]
+            epId
         );
 
         const fetchResponse = await axios.get(
