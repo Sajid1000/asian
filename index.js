@@ -1,7 +1,7 @@
-const express = require('express')
-const morgan = require('morgan')
-const chalk = require('chalk')
-const app = express()
+const express = require('express');
+const morgan = require('morgan');
+const chalk = require('chalk');
+const app = express();
 
 const morganMiddleware = morgan(function (tokens, req, res) {
     return [
@@ -18,29 +18,30 @@ const morganMiddleware = morgan(function (tokens, req, res) {
 });
 
 app.use(morganMiddleware);
-require('dotenv').config()
+require('dotenv').config();
 
-const getDetailRouter = require('./routes/getDetail')
-const getMoviesRouter = require('./routes/getMovies')
-const getOngoingRouter = require('./routes/getOngoing')
-const getPopularRouter = require('./routes/getPopular')
-const getRecentRouter = require('./routes/getRecent')
-const getRecentKDramaRouter = require('./routes/getRecentKDrama')
-const getRecentRawRouter = require('./routes/getRecentRaw')
-const getEpisodeListRouter = require('./routes/getEpisodeList')
-const homeRouter = require('./routes/home')
+const getDetailRouter = require('./routes/getDetail');
+const getMoviesRouter = require('./routes/getMovies');
+const getOngoingRouter = require('./routes/getOngoing');
+const getPopularRouter = require('./routes/getPopular');
+const getRecentRouter = require('./routes/getRecent');
+const getRecentKDramaRouter = require('./routes/getRecentKDrama');
+const getRecentRawRouter = require('./routes/getRecentRaw');
+const getEpisodeListRouter = require('./routes/getEpisodeList');
+const homeRouter = require('./routes/home');
+const getWatchRouter = require('./routes/getWatch');
 
+app.use('/api/detail', getDetailRouter);
+app.use('/api/movies', getMoviesRouter);
+app.use('/api/ongoing', getOngoingRouter);
+app.use('/api/popular', getPopularRouter);
+app.use('/api/recent', getRecentRouter);
+app.use('/api/recentkdrama', getRecentKDramaRouter);
+app.use('/api/recentraw', getRecentRawRouter);
+app.use('/api/episodeList', getEpisodeListRouter);
+app.use('/api/getWatch', getWatchRouter); 
+app.use('*', homeRouter);
 
-app.use('/api/detail', getDetailRouter)
-app.use('/api/movies', getMoviesRouter)
-app.use('/api/ongoing', getOngoingRouter)
-app.use('/api/popular', getPopularRouter)
-app.use('/api/recent', getRecentRouter)
-app.use('/api/recentkdrama', getRecentKDramaRouter)
-app.use('/api/recentraw', getRecentRawRouter)
-app.use('/api/episodeList', getEpisodeListRouter)
-app.use('*', homeRouter)
- 
 app.listen(process.env.PORT, () => {
-console.log(`App listening on port ${process.env.PORT}`)
-})
+    console.log(`App listening on port ${process.env.PORT}`);
+});
