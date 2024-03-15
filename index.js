@@ -29,6 +29,7 @@ const getRecentKDramaRouter = require('./routes/getRecentKDrama');
 const getRecentRawRouter = require('./routes/getRecentRaw');
 const getEpisodeListRouter = require('./routes/getEpisodeList');
 const homeRouter = require('./routes/home');
+const getWatchRouter = require('./routes/getWatch'); // Import the getWatch router
 
 app.use('/api/detail', getDetailRouter);
 app.use('/api/movies', getMoviesRouter);
@@ -38,6 +39,7 @@ app.use('/api/recent', getRecentRouter);
 app.use('/api/recentkdrama', getRecentKDramaRouter);
 app.use('/api/recentraw', getRecentRawRouter);
 app.use('/api/episodeList', getEpisodeListRouter);
+app.use('/api/getWatch', getWatchRouter); // Use the getWatch router with an appropriate endpoint
 app.use('*', homeRouter);
 
 app.listen(process.env.PORT, () => {
