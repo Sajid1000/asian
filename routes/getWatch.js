@@ -2,31 +2,16 @@ const express = require('express');
 const axios = require('axios');
 const cheerio = require('cheerio');
 const { JSDOM } = require('jsdom');
-const { generateEncryptAjaxParameters, decryptEncryptAjaxResponse } = require('./extractors/asianload.js'); // Adjust the import path for asianload.js
+const { generateEncryptAjaxParameters, decryptEncryptAjaxResponse } = require('./extractors/asianload.js');
 
 const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36';
 
 const router = express.Router();
 
-let PROXY_URL;
-
-router.use(corsProxy);
-
-// Cache object to store fetched data
-const cache = {};
-
-async function fetchData(url) {
-    if (cache[url]) {
-        return cache[url];
-    }
-    const response = await axios.get(url);
-    cache[url] = response.data;
-    return response.data;
-}
-
 router.get('/:id', async (req, res) => {
     try {
         const epId = req.params.id;
+        const PROXY_URL = `${req.protocol}://${req.get('host')}/proxy?url=`;
         const url = `${PROXY_URL}https://draplay.info/videos/${epId}`;
         const html = await fetchData(url);
         const dom = new JSDOM(html);
@@ -89,8 +74,3 @@ router.get('/:id', async (req, res) => {
 });
 
 module.exports = router;
-
-async function corsProxy(req, res, next) {
-    PROXY_URL = `${req.protocol}://${req.get('host')}/proxy?url=`;
-    next();
-}
