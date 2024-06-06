@@ -6,7 +6,7 @@ require('dotenv').config()
 const apiKey = process.env.API_KEY
 const router = express.Router();
 
-router.get('/', async (req, res) => {
+router.get('/:id', async (req, res) => {
     let api_key = req.query.api_key
     if (api_key != apiKey) {
         return res.send({response: 'Invalid API Key!'})
