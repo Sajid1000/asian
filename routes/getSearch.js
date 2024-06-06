@@ -6,7 +6,7 @@ require('dotenv').config()
 const apiKey = process.env.API_KEY
 const router = express.Router();
 
-router.get('/:id', async (req, res) => {
+router.get('/', async (req, res) => {
     let api_key = req.query.api_key
     if (api_key != apiKey) {
         return res.send({response: 'Invalid API Key!'})
@@ -16,7 +16,7 @@ router.get('/:id', async (req, res) => {
             const getDetail = async () => {
                 try {
                     let id = req.params.id;
-                    const siteUrl = `https://drama.streamscripts.xyz/search.html?keyword={keyword}`
+                    const siteUrl = `https://draplay.info/search.html?keyword={keyword}`
                     const { data } = await axios.get(siteUrl)
                     const $ = cheerio.load(data)
                     let dataArr = []
