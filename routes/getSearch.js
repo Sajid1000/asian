@@ -16,7 +16,7 @@ router.get('/:id', async (req, res) => {
             const getDetail = async () => {
                 try {
                     let id = req.params.id;
-                    const siteUrl = `https://drama.streamscripts.xyz/search.html?keyword=jj`
+                    const siteUrl = `https://drama.streamscripts.xyz/search.html?keyword={keyword}`
                     const { data } = await axios.get(siteUrl)
                     const $ = cheerio.load(data)
                     let dataArr = []
