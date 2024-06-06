@@ -16,7 +16,7 @@ router.get('/:id', async (req, res) => {
 
     try {
         // Define the scraping function
-        const getDetail = async () => {
+        const getSearch = async () => {
             try {
                 const id = req.params.id;
                 const siteUrl = `https://draplay.info/search.html?keyword=${id}`;
